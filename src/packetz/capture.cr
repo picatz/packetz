@@ -110,6 +110,10 @@ module Packetz
         false
       end
     end
+    
+    def promiscuous_mode!
+      self.promiscuous_mode = 1
+    end
 
     def promiscuous_mode?
       promiscuous_mode
@@ -178,8 +182,8 @@ module Packetz
       end
     end
 
-    def immediate_mode!
-      case LibPcap.pcap_set_immediate_mode(@handle, 1)
+    def immediate_mode=(value : Int32)
+      case LibPcap.pcap_set_immediate_mode(@handle, value)
       when 0
         @immediate_mode = true
         true
@@ -187,9 +191,50 @@ module Packetz
         raise Exception.new "Operation can't be performed on already activated captures."
       end
     end
+    
+    def immediate_mode!
+      self.immediate_mode = 1
+    end
+    
+    def immediate_mode=(value : Bool)
+      case value
+      when true
+        self.immediate_mode = 1
+      when false
+        self.immediate_mode = 0
+      end
+    end
 
     def immediate_mode?
       @immediate_mode || false
+    end
+
+    def non_blocking_mode=(value : Int32)
+      err = LibPcap::PCAP_ERRBUF_SIZE.dup
+      case LibPcap.pcap_setnonblock(@handle, value, pointerof(err))
+      when 0
+        @non_blocking_mode = true
+        true
+      when -1
+        err
+      end
+    end
+
+    def non_blocking_mode!
+      self.non_blocking_mode = 1
+    end
+
+    def non_blocking_mode=(value : Bool)
+      case value
+      when true
+        self.non_blocking_mode = 1
+      when false
+        self.non_blocking_mode = 0
+      end
+    end
+    
+    def non_blocking_mode?
+      @non_blocking_mode || false
     end
 
   end

@@ -38,3 +38,5 @@ end
 ## Contributors
 
 - [picat](https://github.com/picatz) Kent 'picat' Gruber - creator, maintainer
+- [maiha](https://github.com/maiha) maiha - `pcap.cr`
+- [puppetpies](https://github.com/puppetpies) Brian Hood - `libpcap.cr`
