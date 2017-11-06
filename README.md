@@ -1,6 +1,6 @@
 # 🦈  Packetz
 
-Packet capturing library built ontop of [LibPcap](https://github.com/the-tcpdump-group/libpcap).
+Packet capturing library built with [LibPcap](https://github.com/the-tcpdump-group/libpcap).
 
 ## Installation
 
