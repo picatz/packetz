@@ -1,0 +1,9 @@
+name: packetz
+version: 0.1.0
+
+authors:
+  - Kent Gruber <kgruber1@emich.edu>
+
+crystal: 0.23.1
+
+license: MIT
