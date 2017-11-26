@@ -1,20 +1,21 @@
 module Packetz
   class Capture
     def initialize(interface : String = Packetz.interfaces.default, snapshot_length = 65535, promiscuous_mode = 0, timeout_ms = 1)
-      @interface = interface
-      err = LibPcap::PCAP_ERRBUF_SIZE.dup
+      @interface  = interface
+      err         = LibPcap::PCAP_ERRBUF_SIZE.dup
       @timeout_ms = timeout_ms 
-      @handle = LibPcap.pcap_create(@interface, pointerof(err))
-      @closed = true
-      at_exit { LibPcap.pcap_close(@handle) unless closed? } 
-      self.snapshot_length = snapshot_length
+      @handle     = LibPcap.pcap_create(@interface, pointerof(err))
+      @stopped    = true
+      at_exit { LibPcap.pcap_close(@handle) unless stopped? } 
+      self.timeout_ms       = timeout_ms
+      self.snapshot_length  = snapshot_length
       self.promiscuous_mode = promiscuous_mode
     end
 
     def start!
       case LibPcap.pcap_activate(@handle)
       when 0
-        @closed = false
+        @stopped = false
         true
       else
         # TODO: Document all errors
@@ -22,13 +23,33 @@ module Packetz
       end
     end
 
-    def close
-      LibPcap.pcap_close(@handle)
-      @closed = true
+    def interface
+      @interface
     end
 
-    def closed?
-      @closed || false
+    def interface=(interface : String)
+      err = LibPcap::PCAP_ERRBUF_SIZE.dup
+      @handle = LibPcap.pcap_create(@interface, pointerof(err))
+      self.timeout_ms       = self.timeout_ms
+      self.snapshot_length  = self.snapshot_length
+      self.promiscuous_mode = self.promiscuous_mode
+    end
+
+    def reset!
+      self.interface = self.interface
+    end
+
+    def stop!
+      LibPcap.pcap_close(@handle)
+      @stopped = true
+    end
+
+    def stopped?
+      @stopped || false
+    end
+
+    def started?
+      ! self.stopped?
     end
 
     def each
@@ -46,7 +67,7 @@ module Packetz
     end
 
     def next
-      raise Exception.new "Capture has been closed!" if closed?
+      raise Exception.new "Capture has been stopped!" if stopped?
       result = LibPcap.pcap_next_ex(@handle, out pkt_header, out pkt_data)
       { result: result, header: pkt_header, data: pkt_data }
     end
