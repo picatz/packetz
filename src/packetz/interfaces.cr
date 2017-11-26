@@ -14,6 +14,7 @@ module Packetz
       first
     end
 
+    # Get a list of all of the interfaces.
     def self.all
       err = LibPcap::PCAP_ERRBUF_SIZE.dup
       result = LibPcap.pcap_findalldevs(out iface_iterator, pointerof(err)) 
@@ -30,11 +31,16 @@ module Packetz
       end
       LibPcap.pcap_freealldevs(orig)
       interfaces 
-      # fix bug, probably temporarily
-      #interfaces.shift
-      #[Packetz.interfaces.default] + interfaces
+    end
+    
+    # Interate over all of the interfaces.
+    def self.all
+      Packetz.interfaces.all.each do |interface|
+        yield interface
+      end
     end
 
+    # Interate over all of the interfaces.
     def self.each
       Packetz.interfaces.all.each do |interface|
         yield interface
