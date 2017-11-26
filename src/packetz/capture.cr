@@ -6,6 +6,7 @@ module Packetz
       @timeout_ms = timeout_ms 
       @handle     = LibPcap.pcap_create(@interface, pointerof(err))
       @stopped    = true
+      @monitor_mode = false
       at_exit { LibPcap.pcap_close(@handle) unless stopped? } 
       self.timeout_ms       = timeout_ms
       self.snapshot_length  = snapshot_length
@@ -57,7 +58,7 @@ module Packetz
         result = LibPcap.pcap_next_ex(@handle, out pkt_header, out pkt_data)
         case result
         when 1 # success
-          yield pkt_data.to_slice(pkt_header.value.caplen)
+          yield pkt_data.to_slice(pkt_header.value.caplen), pkt_header.value
         when 0 # timeout
           next
         else
@@ -85,6 +86,26 @@ module Packetz
         raise Exception.new "Something went terribly wrong!"
       end
     end 
+    
+    def monitor_mode=(value : Bool)
+      case value
+      when true
+        self.enable_monitor_mode!
+        @monitor_mode = true
+      when false
+        case LibPcap.pcap_set_rfmon(@handle, 0)
+        when 0
+          @monitor_mode = false
+          true
+        else
+          raise Exception.new "Something went terribly wrong!"
+        end
+      end
+    end
+
+    def monitor_mode
+      @monitor_mode
+    end
 
     def snapshot_length
       @snapshot_length
@@ -256,6 +277,10 @@ module Packetz
     
     def non_blocking_mode?
       @non_blocking_mode || false
+    end
+    
+    def monitor_mode?
+      @monitor_mode || false
     end
 
   end
