@@ -12,7 +12,7 @@ dependencies:
     github: picatz/packetz
 ```
 
-## Usage
+## Basic Usage
 
 ```crystal
 require "packetz"
@@ -22,6 +22,35 @@ Packetz.capture do |packet|
   puts packet.hexdump
 end
 ```
+
+#### Craft your Capture
+
+```crystal
+# create capture handler
+cap = Packetz.capture
+
+# stop the capture with ctl+C
+Signal::INT.trap do
+  puts "Stopping!"
+  cap.stop!
+  exit
+end
+
+# setup the handler
+cap.snapshot_length  = 33333
+cap.promiscuous_mode = true
+cap.monitor_mode     = true
+
+# start capturing
+cap.start!
+
+# do something with each packet and its pcap header
+cap.each do |packet, pcap_header|
+  # something
+end
+```
+
+#### Network Interfaces
 
 ```crystal
 # get default interface to capture on
