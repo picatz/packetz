@@ -1,8 +1,17 @@
 module Packetz
   module Interfaces
     def self.default
+      # for some reason, this is the way LibPcap API wants to to do this.
       err = LibPcap::PCAP_ERRBUF_SIZE.dup
-      String.new(LibPcap.pcap_lookupdev(pointerof(err)))
+      result = LibPcap.pcap_findalldevs(out iface_iterator, pointerof(err)) 
+      if result == -1
+        raise Exception.new "Unable to find devices! #{err}"
+      end
+      # get first interface in the iterator
+      first = String.new(iface_iterator.value.name)
+      # free 'dat list
+      LibPcap.pcap_freealldevs(iface_iterator)
+      first
     end
 
     def self.all
@@ -22,8 +31,8 @@ module Packetz
       LibPcap.pcap_freealldevs(orig)
       interfaces 
       # fix bug, probably temporarily
-      interfaces.shift
-      [Packetz.interfaces.default] + interfaces
+      #interfaces.shift
+      #[Packetz.interfaces.default] + interfaces
     end
 
     def self.each
