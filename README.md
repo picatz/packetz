@@ -18,19 +18,19 @@ dependencies:
 require "packetz"
 
 # start packet capture on default interface
-Packet.capture do |packet|
+Packetz.capture do |packet|
   puts packet.hexdump
 end
 ```
 
 ```crystal
 # get default interface to capture on
-Packetz.default_interface
+Packetz.interfaces.default
 ```
 
 ```crystal
 # get all possible interfaces
-Packetz.all_interfaces do |interface|
+Packetz.interfaces.all do |interface|
   puts interface
 end
 ```
