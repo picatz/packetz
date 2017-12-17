@@ -1,11 +1,11 @@
 module Packetz
   class Capture
     def initialize(interface : String = Packetz.interfaces.default, snapshot_length = 65535, promiscuous_mode = 0, timeout_ms = 1)
-      @interface  = interface
-      err         = LibPcap::PCAP_ERRBUF_SIZE.dup
-      @timeout_ms = timeout_ms 
-      @handle     = LibPcap.pcap_create(@interface, pointerof(err))
-      @stopped    = true
+      @interface    = interface
+      err           = LibPcap::PCAP_ERRBUF_SIZE.dup
+      @timeout_ms   = timeout_ms 
+      @handle       = LibPcap.pcap_create(@interface, pointerof(err))
+      @stopped      = true
       @monitor_mode = false
       at_exit { LibPcap.pcap_close(@handle) unless stopped? } 
       self.timeout_ms       = timeout_ms
