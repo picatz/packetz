@@ -61,8 +61,6 @@ module Packetz
           yield pkt_data.to_slice(pkt_header.value.caplen), pkt_header.value
         when 0 # timeout
           next
-        else
-          raise Exception.new "Something went terribly wrong!"
         end
       end
     end
