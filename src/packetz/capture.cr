@@ -81,7 +81,7 @@ module Packetz
         true
       else
         # TODO: document erors
-        raise Exception.new "Something went terribly wrong!"
+        raise Exception.new "Something went terribly wrong trying to enable monitor mode quickly!"
       end
     end 
     
@@ -96,7 +96,7 @@ module Packetz
           @monitor_mode = false
           true
         else
-          raise Exception.new "Something went terribly wrong!"
+          raise Exception.new "Something went terribly wrong trying to enable monitor mode manually!"
         end
       end
     end
@@ -138,7 +138,7 @@ module Packetz
         @promiscuous_mode = value 
         true
       when -4 
-        raise Exception.new "Operation can't be performed on already activated captures."
+        raise Exception.new "Promiscuous mode operation can't be performed on already activated captures."
       end
     end
 
@@ -169,7 +169,7 @@ module Packetz
       when 0
         true
       when -4
-        raise Exception.new "Operation can't be performed on already activated captures."
+        raise Exception.new "Timeout operation can't be performed on already activated captures."
       end
     end
 
