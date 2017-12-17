@@ -1,16 +1,42 @@
 module Packetz
+  # The `Capture` class is responsible for all of the supported capturing operations provided 
+  # by `LibPcap` in a clean, friendly API.
+  # 
+  # Simply start a new capture object called `cap`, with all the defaults:
+  # ```
+  # cap = Packetz::Capture.new
+  # ```
+  # 
+  # If you want to start customizing the capture object during initialization, you have a few
+  # ways to do that to change the `interface`, `snapshot_length`, `promiscuous_mode` and `timeout_ms` values
+  # of a capture.
+  #
+  # Listen specifically on the `en0` network interface: 
+  # ```
+  # cap = Packetz::Capture.new("en0")
+  # ```
+  #
+  # Listen with alll the default options, but in promiscuous mode:
+  # ```
+  # cap = Packetz::Capture.new(promiscuous_mode = true)
+  # ```
+  # 
+  # Change the default snapshot length from `65535` to half that size.
+  # ```
+  # cap = Packetz::Capture.new(snapshot_length: 65535/2)
+  # ```
   class Capture
-    def initialize(interface : String = Packetz.interfaces.default, snapshot_length = 65535, promiscuous_mode = 0, timeout_ms = 1)
-      @interface    = interface
-      err           = LibPcap::PCAP_ERRBUF_SIZE.dup
-      @timeout_ms   = timeout_ms 
-      @handle       = LibPcap.pcap_create(@interface, pointerof(err))
-      @stopped      = true
-      @monitor_mode = false
+    # The `#initialize` method takes care of setting up a **new** `Capture` object.  
+    def initialize(@interface        : String = Packetz.interfaces.default, 
+                   @snapshot_length  = 65535, 
+                   @promiscuous_mode = 0, 
+                   @timeout_ms       = 1, 
+                   @monitor_mode     = false)
+      err      = LibPcap::PCAP_ERRBUF_SIZE.dup
+      @handle  = LibPcap.pcap_create(@interface, pointerof(err))
+      @stopped = true
+      # some automatic cleanup for lazy
       at_exit { LibPcap.pcap_close(@handle) unless stopped? } 
-      self.timeout_ms       = timeout_ms
-      self.snapshot_length  = snapshot_length
-      self.promiscuous_mode = promiscuous_mode
     end
 
     def start!
