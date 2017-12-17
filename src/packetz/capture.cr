@@ -29,16 +29,22 @@ module Packetz
     # The `#initialize` method takes care of setting up a **new** `Capture` object.  
     def initialize(@interface        : String = Packetz.interfaces.default, 
                    @snapshot_length  = 65535, 
-                   @promiscuous_mode = 0, 
+                   @promiscuous_mode : Bool | Int32 = 0, 
                    @timeout_ms       = 1, 
                    @monitor_mode     = false)
       err      = LibPcap::PCAP_ERRBUF_SIZE.dup
       @handle  = LibPcap.pcap_create(@interface, pointerof(err))
       @stopped = true
+      # need to actually set the given information with the C API
+      self.timeout_ms       = @timeout_ms
+      self.snapshot_length  = @snapshot_length
+      self.promiscuous_mode = @promiscuous_mode
+      self.monitor_mode     = @monitor_mode
       # some automatic cleanup for lazy
-      at_exit { LibPcap.pcap_close(@handle) unless stopped? } 
+      at_exit { stop! unless stopped? } 
     end
 
+    # Handles activating the actual packet capturing.
     def start!
       case LibPcap.pcap_activate(@handle)
       when 0
@@ -50,16 +56,19 @@ module Packetz
       end
     end
 
+    # Provides access to underlying interface string.
     def interface
       @interface
     end
 
+    # Set the network interface to a given string.
     def interface=(interface : String)
       err = LibPcap::PCAP_ERRBUF_SIZE.dup
       @handle = LibPcap.pcap_create(@interface, pointerof(err))
       self.timeout_ms       = self.timeout_ms
       self.snapshot_length  = self.snapshot_length
       self.promiscuous_mode = self.promiscuous_mode
+      self.monitor_mode     = self.monitor_mode
     end
 
     def reset!

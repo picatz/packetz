@@ -28,15 +28,23 @@ module Packetz
 
   # The `#capture` method provides a delicious, syntactic sugar to be able to
   # access the underlying `Capture` module to perform live packet captures.
-  def self.capture(interface = Packetz.interfaces.default, snaplen = 65535, promisc = 0, timeout_ms = 1)
-    Capture.new(interface, snaplen, promisc, timeout_ms)
+	def self.capture(interface = Packetz.interfaces.default, 
+									 snapshot_length = 65535, 
+									 promiscuous_mode = false, 
+									 timeout_ms = 1,
+									 monitor_mode = false)
+    Capture.new(interface, snapshot_length, promiscuous_mode, timeout_ms, monitor_mode)
   end
  
   # When the `#capture` method is used within a block syntax, then it can quickly start
   # yielding packets to the underlying block. This is an optional way to start capturing 
   # packets right away. 
-  def self.capture(interface = Packetz.interfaces.default, snaplen = 65535, promisc = 0, timeout_ms = 1)
-    cap = Packetz.capture(interface, snaplen, promisc, timeout_ms)
+	def self.capture(interface = Packetz.interfaces.default, 
+									 snapshot_length = 65535, 
+									 promiscuous_mode = false, 
+									 timeout_ms = 1,
+									 monitor_mode = false)
+    cap = Packetz.capture(interface, snapshot_length, promiscuous_mode, timeout_ms, monitor_mode)
     cap.start!
     cap.each do |packet|
       yield packet
