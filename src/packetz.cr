@@ -25,7 +25,7 @@ module Packetz
   def self.interfaces
     Interfaces
   end
-
+  
   # The `#capture` method provides a delicious, syntactic sugar to be able to
   # access the underlying `Capture` module to perform live packet captures.
 	def self.capture(interface = Packetz.interfaces.default, 
