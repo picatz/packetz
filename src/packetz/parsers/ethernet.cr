@@ -17,6 +17,7 @@ module Packetz
       property payload     : Slice(UInt8)
 
       def initialize(packet : Slice(UInt8))
+        raise Exception.new "Packet is too small to parse ethernet header!" unless packet.size > 13
         @destination = packet[0,6].map { |uint16| "%02x" % uint16 }.join(":")
         @source      = packet[6,6].map { |uint16| "%02x" % uint16 }.join(":") 
         @type        = LibC.ntohs(packet[12]) + packet[13]
