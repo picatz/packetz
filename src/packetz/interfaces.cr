@@ -1,5 +1,6 @@
 module Packetz
   module Interfaces
+    # Get the first, non-loopback network interface to listen on. 
     def self.default
       # for some reason, this is the way LibPcap API wants to to do this.
       err = LibPcap::PCAP_ERRBUF_SIZE.dup
@@ -29,6 +30,7 @@ module Packetz
         interfaces << String.new(iface.name)
         iface_iterator = iface.next
       end
+      # free 'dat list
       LibPcap.pcap_freealldevs(orig)
       interfaces 
     end
@@ -49,10 +51,10 @@ module Packetz
 
     # Check if a given interface supports monitor mode.
     def self.supports_monitor_mode?(interface : String)
-      err1 = Packetz::LibPcap::PCAP_ERRBUF_SIZE.dup
+      err1  = Packetz::LibPcap::PCAP_ERRBUF_SIZE.dup
       iface = Packetz::LibPcap.pcap_lookupdev(pointerof(err1))
-      err2 = Packetz::LibPcap::PCAP_ERRBUF_SIZE.dup
-      live = Packetz::LibPcap.pcap_create(iface, pointerof(err2))
+      err2  = Packetz::LibPcap::PCAP_ERRBUF_SIZE.dup
+      live  = Packetz::LibPcap.pcap_create(iface, pointerof(err2))
       begin
         case Packetz::LibPcap.pcap_can_set_rfmon(live)
         when 1
